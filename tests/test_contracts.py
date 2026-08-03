@@ -1,6 +1,6 @@
+import json
 from datetime import UTC, datetime
 from pathlib import Path
-import json
 
 from jsonschema import Draft202012Validator
 
@@ -35,9 +35,11 @@ def _envelope() -> ChannelEnvelope:
 
 def test_channel_envelope_matches_json_schema() -> None:
     schema = json.loads((ROOT / "contracts/channel-envelope.schema.json").read_text())
-    Draft202012Validator(schema, format_checker=Draft202012Validator.FORMAT_CHECKER).validate(
-        _envelope().model_dump(mode="json")
+    validator = Draft202012Validator(
+        schema,
+        format_checker=Draft202012Validator.FORMAT_CHECKER,
     )
+    validator.validate(_envelope().model_dump(mode="json"))
 
 
 def test_contract_json_files_are_valid_json() -> None:

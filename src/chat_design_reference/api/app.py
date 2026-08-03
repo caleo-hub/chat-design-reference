@@ -17,7 +17,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
 
     @app.get("/")
-    async def index() -> dict[str, str]:
+    def index() -> dict[str, str]:
         return {
             "name": resolved.app_name,
             "version": __version__,
@@ -25,7 +25,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         }
 
     @app.get("/health/live")
-    async def liveness() -> dict[str, str]:
+    def liveness() -> dict[str, str]:
         return {
             "status": "alive",
             "service": resolved.app_name,
@@ -33,7 +33,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         }
 
     @app.get("/health/ready")
-    async def readiness() -> JSONResponse:
+    def readiness() -> JSONResponse:
         if resolved.is_runtime_wired:
             return JSONResponse(
                 status_code=200,
@@ -49,7 +49,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 "status": "not_ready",
                 "service": resolved.app_name,
                 "version": __version__,
-                "reason": "persistence_not_configured",
+                "reason": "durable_runtime_not_wired",
             },
         )
 

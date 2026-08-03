@@ -19,4 +19,14 @@ def test_readiness_does_not_claim_success_without_persistence() -> None:
     response = client.get("/health/ready")
 
     assert response.status_code == 503
-    assert response.json()["reason"] == "persistence_not_configured"
+    assert response.json()["reason"] == "durable_runtime_not_wired"
+
+
+def test_database_url_alone_does_not_make_foundation_ready() -> None:
+    client = TestClient(
+        create_app(Settings(database_url="postgresql+asyncpg://example", runtime_wired=False))
+    )
+
+    response = client.get("/health/ready")
+
+    assert response.status_code == 503
