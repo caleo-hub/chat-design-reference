@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/contracts/internal-event/v1",
+  "title": "InternalEvent",
+  "description": "Envelope inspirado em CloudEvents para eventos internos persistidos.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["specversion", "id", "source", "type", "time", "correlationid", "tenantid", "data"],
+  "properties": {
+    "specversion": {"const": "1.0"},
+    "id": {"type": "string", "minLength": 1},
+    "source": {"type": "string", "minLength": 1},
+    "type": {"type": "string", "pattern": "^[a-z0-9]+(?:[._-][a-z0-9]+)+$"},
+    "subject": {"type": ["string", "null"]},
+    "time": {"type": "string", "format": "date-time"},
+    "datacontenttype": {"const": "application/json"},
+    "dataschema": {"type": ["string", "null"], "format": "uri"},
+    "correlationid": {"type": "string", "minLength": 1},
+    "causationid": {"type": ["string", "null"]},
+    "tenantid": {"type": "string", "minLength": 1},
+    "schema_version": {"type": "integer", "minimum": 1},
+    "data": {"type": "object", "additionalProperties": true}
+  }
+}

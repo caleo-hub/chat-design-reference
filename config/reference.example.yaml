@@ -1,0 +1,69 @@
+schema_version: 1
+project:
+  slug: example-chat
+  display_name: Example Chat
+  maturity_profile: mvp
+  tenancy: single_tenant
+
+channels:
+  enabled:
+    - web
+  adapters:
+    web:
+      transport: sse
+      authentication: bearer
+    whatsapp:
+      provider: define-me
+      webhook_signature: required
+    teams:
+      provider: microsoft-bot-framework
+
+agent_runtime:
+  adapter: langgraph
+  supervisor_pattern: supervisor_subagents
+  model_provider: openai
+  model: define-me
+  prompt_version: v1
+  graph_version: v1
+
+agents:
+  - slug: supervisor
+    specification: specs/agents/supervisor.md
+    allowed_subagents: []
+    allowed_tool_scopes: []
+
+tools:
+  gateway: mcp
+  require_authentication: true
+  default_timeout_seconds: 20
+  mutation_requires_idempotency_key: true
+  destructive_requires_human_approval: true
+
+memory:
+  session: postgres_checkpoints
+  durable: curated_only
+  summarization: enabled
+  retention_days: define-me
+
+knowledge:
+  enabled: false
+  evidence_required: true
+
+operations:
+  queue_backend: postgres
+  delivery: transactional_outbox
+  heartbeat_seconds: 15
+  lease_seconds: 120
+  nudge_after_seconds: 15
+  turn_timeout_seconds: 90
+  max_attempts: 5
+
+observability:
+  tracing: opentelemetry
+  llm_observability: optional
+  pii_in_telemetry: forbidden
+
+security:
+  data_classification: define-me
+  retention_policy: define-me
+  admin_access: private_network

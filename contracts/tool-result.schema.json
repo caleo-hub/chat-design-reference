@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/contracts/tool-result/v1",
+  "title": "ToolResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "call_id", "tool_name", "status", "data"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "call_id": {"type": "string", "minLength": 1},
+    "tool_name": {"type": "string", "minLength": 1},
+    "status": {
+      "enum": [
+        "succeeded",
+        "not_found",
+        "needs_user_input",
+        "needs_human",
+        "rejected",
+        "retryable_error",
+        "permanent_error",
+        "outcome_unknown"
+      ]
+    },
+    "idempotency_key": {"type": ["string", "null"]},
+    "data": {"type": "object", "additionalProperties": true},
+    "public_message": {"type": ["string", "null"], "maxLength": 4000},
+    "error_code": {"type": ["string", "null"], "maxLength": 200},
+    "retry_after_seconds": {"type": ["number", "null"], "minimum": 0},
+    "effect_reference": {"type": ["string", "null"]},
+    "metadata": {"type": "object", "additionalProperties": true}
+  }
+}
