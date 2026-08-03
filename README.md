@@ -1,5 +1,9 @@
 # Chat Design Reference
 
+[![CI](https://github.com/caleo-hub/chat-design-reference/actions/workflows/ci.yml/badge.svg)](https://github.com/caleo-hub/chat-design-reference/actions/workflows/ci.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
+[![Python 3.12+](https://img.shields.io/badge/Python-3.12%2B-blue.svg)](pyproject.toml)
+
 Arquitetura de referência e template para construir chats profissionais com IA em **Python**, executados em **VPS**, seguindo o estilo de **monólito modular**.
 
 O objetivo é evitar que cada novo chatbot precise redescobrir infraestrutura, confiabilidade, segurança, memória, filas, observabilidade, handoff humano e integração com ferramentas. Um projeto derivado deve trocar apenas as variabilidades do seu caso — canais, identidade, framework de agentes, modelos, prompts, MCPs, conhecimento e políticas — sem desmontar os invariantes operacionais.
@@ -100,6 +104,7 @@ Detalhes e dependências permitidas: [Catálogo de módulos](docs/architecture/m
 
 ```text
 .
+├── .github/               CI, ownership, PR template e Dependabot
 ├── specs/                 princípios e comportamento verificável
 ├── docs/
 │   ├── adoption/          aplicação do runbook a priori
@@ -111,12 +116,14 @@ Detalhes e dependências permitidas: [Catálogo de módulos](docs/architecture/m
 ├── contracts/             OpenAPI e JSON Schemas
 ├── config/                perfil de customização
 ├── src/                   harness e contratos Python
-└── tests/                 contratos, arquitetura e smoke tests
+├── tests/                 contratos, arquitetura e smoke tests
+├── CHANGELOG.md           evolução da referência
+└── LICENSE                Apache License 2.0
 ```
 
 ## Começar um novo chat
 
-1. Use este repositório como template ou faça fork.
+1. Use este repositório como template, faça fork ou clone para um novo projeto.
 2. Copie `config/reference.example.yaml` para um perfil do produto.
 3. Preencha visão, riscos, política de dados e SLOs.
 4. Escolha adapters de canal, agent runtime e MCP.
@@ -135,6 +142,16 @@ make verify
 make run
 ```
 
+## Governança da referência
+
+- mudanças estruturais exigem ADR;
+- contratos públicos exigem versionamento e compatibilidade explícita;
+- alterações críticas usam revisão proporcional ao risco;
+- `CODEOWNERS` protege as fontes arquiteturais;
+- o template de PR exige evidências, risco e rollback;
+- Dependabot acompanha dependências Python e GitHub Actions;
+- o changelog registra releases da referência.
+
 ## Fontes de verdade
 
 - princípios: `specs/constitution.md`;
@@ -147,4 +164,4 @@ make run
 
 ## Licença e uso
 
-A definição de licença permanece pendente. Antes de distribuir projetos derivados, escolha e registre a licença apropriada.
+Este projeto é distribuído sob a [Apache License 2.0](LICENSE). A licença permite reutilização e adaptação da referência, observadas suas condições de atribuição, avisos e redistribuição.
