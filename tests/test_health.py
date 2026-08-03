@@ -1,32 +1,33 @@
-from fastapi.testclient import TestClient
+from httpx import ASGITransport, AsyncClient
 
 from chat_design_reference.api.app import create_app
 from chat_design_reference.config import Settings
 
 
-def test_liveness_is_independent_from_runtime_dependencies() -> None:
-    client = TestClient(create_app(Settings(database_url="")))
+async def _get(path: str, settings: Settings):
+    transport = ASGITransport(app=create_app(settings))
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        return await client.get(path)
 
-    response = client.get("/health/live")
+
+async def test_liveness_is_independent_from_runtime_dependencies() -> None:
+    response = await _get("/health/live", Settings(database_url=""))
 
     assert response.status_code == 200
     assert response.json()["status"] == "alive"
 
 
-def test_readiness_does_not_claim_success_without_persistence() -> None:
-    client = TestClient(create_app(Settings(database_url="")))
-
-    response = client.get("/health/ready")
+async def test_readiness_does_not_claim_success_without_persistence() -> None:
+    response = await _get("/health/ready", Settings(database_url=""))
 
     assert response.status_code == 503
     assert response.json()["reason"] == "durable_runtime_not_wired"
 
 
-def test_database_url_alone_does_not_make_foundation_ready() -> None:
-    client = TestClient(
-        create_app(Settings(database_url="postgresql+asyncpg://example", runtime_wired=False))
+async def test_database_url_alone_does_not_make_foundation_ready() -> None:
+    response = await _get(
+        "/health/ready",
+        Settings(database_url="postgresql+asyncpg://example", runtime_wired=False),
     )
-
-    response = client.get("/health/ready")
 
     assert response.status_code == 503
