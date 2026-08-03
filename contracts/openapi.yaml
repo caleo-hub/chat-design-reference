@@ -1,0 +1,154 @@
+openapi: 3.1.0
+info:
+  title: Chat Design Reference API
+  version: 0.1.0
+  description: Contrato-alvo da superfície pública; adapters de provider podem expor rotas adicionais.
+servers:
+  - url: https://chat.example.com
+paths:
+  /health/live:
+    get:
+      operationId: getLiveness
+      responses:
+        '200':
+          description: Processo vivo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+  /health/ready:
+    get:
+      operationId: getReadiness
+      responses:
+        '200':
+          description: Papel pronto para receber trabalho
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+        '503':
+          description: Processo vivo, mas não pronto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+  /v1/channels/{channel}/events:
+    post:
+      operationId: receiveChannelEvent
+      description: Endpoint canônico. O adapter deve autenticar o request antes de produzir o envelope.
+      parameters:
+        - name: channel
+          in: path
+          required: true
+          schema: {type: string}
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema: {type: string, maxLength: 200}
+      security:
+        - WebhookSignature: []
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './channel-envelope.schema.json'
+      responses:
+        '202':
+          description: Evento persistido ou já recebido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Receipt'
+        '400': {description: Envelope inválido}
+        '401': {description: Autenticação inválida}
+        '413': {description: Payload acima do limite}
+        '429': {description: Rate limit}
+  /v1/turns/{turn_id}:
+    get:
+      operationId: getTurn
+      parameters:
+        - name: turn_id
+          in: path
+          required: true
+          schema: {type: string, format: uuid}
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Estado público do turn
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TurnStatus'
+        '404': {description: Turn não encontrado}
+  /v1/turns/{turn_id}/events:
+    get:
+      operationId: streamTurnEvents
+      description: Projeção SSE para clientes web; não substitui inbox/outbox.
+      parameters:
+        - name: turn_id
+          in: path
+          required: true
+          schema: {type: string, format: uuid}
+        - name: Last-Event-ID
+          in: header
+          required: false
+          schema: {type: string}
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Stream de eventos do turn
+          content:
+            text/event-stream:
+              schema: {type: string}
+  /v1/turns/{turn_id}/cancel:
+    post:
+      operationId: requestTurnCancellation
+      parameters:
+        - name: turn_id
+          in: path
+          required: true
+          schema: {type: string, format: uuid}
+      security:
+        - BearerAuth: []
+      responses:
+        '202': {description: Cancelamento solicitado}
+        '409': {description: Turn já finalizado ou efeito exige reconciliação}
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+    WebhookSignature:
+      type: apiKey
+      in: header
+      name: X-Webhook-Signature
+  schemas:
+    Health:
+      type: object
+      required: [status, service, version]
+      properties:
+        status: {enum: [alive, ready, not_ready, degraded]}
+        service: {type: string}
+        version: {type: string}
+        reason: {type: [string, 'null']}
+    Receipt:
+      type: object
+      required: [status, receipt_id, correlation_id]
+      properties:
+        status: {enum: [accepted, duplicate]}
+        receipt_id: {type: string, format: uuid}
+        turn_id: {type: [string, 'null'], format: uuid}
+        correlation_id: {type: string}
+    TurnStatus:
+      type: object
+      required: [turn_id, status, updated_at]
+      properties:
+        turn_id: {type: string, format: uuid}
+        status:
+          enum: [queued, processing, waiting_tool, waiting_human, completed, failed, cancelled, reconciliation_required]
+        updated_at: {type: string, format: date-time}
+        public_message: {type: [string, 'null']}
