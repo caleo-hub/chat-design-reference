@@ -12,7 +12,6 @@ from chat_design_reference.core.contracts import (
     MessageDirection,
 )
 
-
 ROOT = Path(__file__).resolve().parents[1]
 
 
