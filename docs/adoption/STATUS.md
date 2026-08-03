@@ -26,7 +26,7 @@ Tornar os limites da referência revisáveis, localizar as variabilidades e prep
 - pesquisa arquitetural anterior aplicada aos módulos e runtime;
 - runbook a priori consultado e rastreado;
 - PR #1 criado com os artefatos de fundação;
-- CI run #2 concluído com sucesso em 2026-08-03;
+- CI mais recente do PR concluído com sucesso em 2026-08-03;
 - Ruff sem violações;
 - mypy strict sem problemas em 8 arquivos-fonte;
 - 6 testes aprovados;
