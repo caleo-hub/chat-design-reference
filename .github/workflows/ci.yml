@@ -24,7 +24,7 @@ jobs:
           version: "0.12.1"
           python-version: "3.12"
           enable-cache: true
-      - run: uv sync --all-groups
+      - run: uv sync --locked --all-groups
       - run: make verify
       - name: Validate OpenAPI YAML parses
-        run: uv run python -c "import pathlib,yaml; yaml.safe_load(pathlib.Path('contracts/openapi.yaml').read_text())"
+        run: uv run --locked python -c "import pathlib,yaml; yaml.safe_load(pathlib.Path('contracts/openapi.yaml').read_text())"
