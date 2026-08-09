@@ -2,15 +2,16 @@
 
 ## Missão
 
-Evoluir uma arquitetura de referência para chats profissionais com IA sem permitir que canal, framework de agentes, LLM ou integração externa governem o núcleo do sistema.
+Evoluir uma arquitetura de referência para chats profissionais com IA sem permitir que canal, framework de agentes, LLM, integração externa ou provedor de nuvem governem o núcleo do sistema.
 
 ## Antes de editar
 
 1. Leia a spec ou ADR relacionada à tarefa.
 2. Leia `docs/architecture/index.md` e o documento do módulo afetado.
-3. Execute `make check` e registre falhas preexistentes.
-4. Distinga arquitetura obrigatória, customização e trabalho ainda não implementado.
-5. Faça mudanças pequenas e reversíveis.
+3. Para mudanças de AWS, GenAI, dados, agents ou review Well-Architected, leia `docs/aws-generative-ai-lens/index.md`.
+4. Execute `make check` e registre falhas preexistentes.
+5. Distinga arquitetura obrigatória, perfil de deploy, customização e trabalho ainda não implementado.
+6. Faça mudanças pequenas e reversíveis.
 
 ## Fontes de verdade
 
@@ -18,6 +19,7 @@ Evoluir uma arquitetura de referência para chats profissionais com IA sem permi
 - Princípios: `specs/constitution.md`
 - Features: `specs/features/`
 - Arquitetura: `docs/architecture/`
+- Perfil AWS e review GenAI: `docs/aws-generative-ai-lens/`
 - Decisões: `docs/adr/`
 - API e eventos: `contracts/`
 - Segurança: `docs/security/threat-model.md`
@@ -25,7 +27,7 @@ Evoluir uma arquitetura de referência para chats profissionais com IA sem permi
 
 ## Limites arquiteturais
 
-- O núcleo não importa FastAPI, SDK de canal, ORM, LangChain, CrewAI ou cliente MCP.
+- O núcleo não importa FastAPI, SDK de canal, ORM, LangChain, CrewAI, cliente MCP ou SDK de nuvem.
 - Adapters dependem de portas; portas não dependem de adapters.
 - Nenhum webhook executa LLM ou efeito externo de negócio.
 - Nenhuma mensagem de negócio é enviada antes de existir registro durável na outbox.
@@ -33,6 +35,7 @@ Evoluir uma arquitetura de referência para chats profissionais com IA sem permi
 - Tools sensíveis não ficam disponíveis irrestritamente ao modelo.
 - Dados sensíveis, prompts integrais e payloads brutos não são registrados por padrão.
 - Alterações de contrato exigem versão, testes de compatibilidade e estratégia de rollout.
+- Serviços AWS ou de outro provedor são implementações de adapters/perfis; não atravessam as fronteiras do core.
 
 ## Comandos canônicos
 
@@ -50,7 +53,7 @@ Pare antes de alterar:
 - contrato público incompatível;
 - ação destrutiva ou irreversível;
 - tecnologia estrutural ou nova dependência central;
-- infraestrutura de produção, secrets ou migração destrutiva;
+- perfil de estado/fila, região, infraestrutura de produção, secrets ou migração destrutiva;
 - invariantes definidos em `specs/constitution.md`.
 
 ## Evidência de conclusão
