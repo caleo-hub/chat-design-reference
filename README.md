@@ -4,9 +4,9 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Python 3.12+](https://img.shields.io/badge/Python-3.12%2B-blue.svg)](pyproject.toml)
 
-Arquitetura de referência e template para construir chats profissionais com IA em **Python**, executados em **VPS**, seguindo o estilo de **monólito modular**.
+Arquitetura de referência e template para construir chats profissionais com IA em **Python**, executados em **VPS ou AWS**, seguindo o estilo de **monólito modular**.
 
-O objetivo é evitar que cada novo chatbot precise redescobrir infraestrutura, confiabilidade, segurança, memória, filas, observabilidade, handoff humano e integração com ferramentas. Um projeto derivado deve trocar apenas as variabilidades do seu caso — canais, identidade, framework de agentes, modelos, prompts, MCPs, conhecimento e políticas — sem desmontar os invariantes operacionais.
+O objetivo é evitar que cada novo chatbot precise redescobrir infraestrutura, confiabilidade, segurança, memória, filas, observabilidade, handoff humano e integração com ferramentas. Um projeto derivado deve trocar apenas as variabilidades do seu caso — canais, identidade, framework de agentes, modelos, prompts, MCPs, conhecimento, políticas e perfil de deploy — sem desmontar os invariantes operacionais.
 
 > Estado atual: **fundação arquitetural v0.1**. Este repositório contém especificações, contratos, decisões, módulos de referência e um harness mínimo. Ainda não é um produto pronto para produção.
 
@@ -18,13 +18,13 @@ Este repositório torna essas preocupações explícitas e reutilizáveis.
 
 ## Decisão arquitetural principal
 
-O sistema é um **monólito modular**: um único código-fonte e um único artefato de aplicação, com módulos internos e contratos rigorosos. Na VPS, o mesmo artefato pode assumir papéis de processo distintos — API, worker, sender e scheduler — para isolamento de falhas e escala operacional sem transformar o produto em microsserviços.
+O sistema é um **monólito modular**: um único código-fonte e um único artefato de aplicação, com módulos internos e contratos rigorosos. Na VPS ou em containers gerenciados na AWS, o mesmo artefato pode assumir papéis de processo distintos — API, worker, sender e scheduler — para isolamento de falhas e escala operacional sem transformar o produto em microsserviços.
 
 ```mermaid
 flowchart LR
     C[WhatsApp / Teams / Web / outros] --> E[Edge + Channel Adapters]
     E --> API[API / Webhook]
-    API --> DB[(PostgreSQL\nInbox + Estado + Outbox)]
+    API --> DB[(PostgreSQL<br/>Inbox + Estado + Outbox)]
     DB --> W[Worker]
     W --> O[Supervisor / Orquestração]
     O --> A[Agent Runtime Adapter]
@@ -54,7 +54,7 @@ Projetos derivados devem preservar, salvo ADR explícito:
 - retries apenas com semântica de idempotência e resultado conhecido;
 - DLQ, reconciliação, heartbeat, watchdog, nudge, timeout e cancelamento;
 - correlação ponta a ponta, logs sanitizados e rastreabilidade de versões;
-- núcleo de aplicação sem dependência de FastAPI, LangChain, CrewAI ou SDK de canal.
+- núcleo de aplicação sem dependência de FastAPI, LangChain, CrewAI, SDK de canal ou SDK de nuvem.
 
 ## O que é configurável
 
@@ -67,9 +67,22 @@ Projetos derivados devem preservar, salvo ADR explícito:
 - memória, RAG e fontes de conhecimento;
 - regras de handoff, aprovação e atendimento humano;
 - limites, SLOs, retenção, multitenancy e políticas de dados;
-- componentes opcionais de observabilidade.
+- componentes opcionais de observabilidade;
+- perfil de deploy: VPS, AWS ECS/Fargate, serverless por ADR ou outro ambiente.
 
 Veja [Customização](docs/architecture/customization.md).
+
+## AWS Generative AI Lens para chats e assistentes
+
+O repositório inclui uma adaptação completa do **AWS Well-Architected Generative AI Lens** ao cenário de chats/assistentes, preservando a independência do núcleo:
+
+- fundamentos, Responsible AI, lifecycle, data architecture e Agentic AI;
+- arquiteturas-base em AWS para monólito modular, RAG, tools transacionais, multi-tenant, contact center, serverless e modelos customizados;
+- oito cenários do Lens reinterpretados;
+- os seis pilares com as **51 best practices** rastreadas pelos IDs oficiais;
+- checklist de review, lifecycle mapping, glossary, fontes, revisões e notices.
+
+Comece pelo [índice da adaptação AWS](docs/aws-generative-ai-lens/index.md) e pelo [deploy de referência na AWS](docs/architecture/deployment-aws.md). O [deploy em VPS](docs/architecture/deployment-vps.md) permanece válido como baseline cloud-neutral.
 
 ## Perfis de maturidade
 
@@ -109,7 +122,8 @@ Detalhes e dependências permitidas: [Catálogo de módulos](docs/architecture/m
 ├── docs/
 │   ├── adoption/          aplicação do runbook a priori
 │   ├── product/           visão e PRD da referência
-│   ├── architecture/      C4, runtime, módulos e deploy
+│   ├── architecture/      C4, runtime, módulos e deploys VPS/AWS
+│   ├── aws-generative-ai-lens/  adaptação do Lens para chats/assistentes
 │   ├── adr/               decisões arquiteturais
 │   ├── security/          threat model
 │   └── runbooks/          criação e operação
@@ -127,9 +141,10 @@ Detalhes e dependências permitidas: [Catálogo de módulos](docs/architecture/m
 2. Copie `config/reference.example.yaml` para um perfil do produto.
 3. Preencha visão, riscos, política de dados e SLOs.
 4. Escolha adapters de canal, agent runtime e MCP.
-5. Especifique agentes e tools antes de implementá-los.
-6. Implemente uma fatia vertical, preservando os fitness functions.
-7. Suba em ambiente local/VPS e execute os testes de falha e restauração.
+5. Escolha o perfil de deploy e execute o review do Lens aplicável.
+6. Especifique agentes e tools antes de implementá-los.
+7. Implemente uma fatia vertical, preservando os fitness functions.
+8. Suba em ambiente local/VPS/AWS e execute os testes de falha e restauração.
 
 Runbook completo: [Criar um novo chat](docs/runbooks/create-new-chat.md).
 
@@ -156,6 +171,7 @@ make run
 
 - princípios: `specs/constitution.md`;
 - arquitetura: `docs/architecture/index.md`;
+- AWS Lens adaptado: `docs/aws-generative-ai-lens/index.md`;
 - contratos públicos: `contracts/`;
 - decisões: `docs/adr/`;
 - segurança: `docs/security/threat-model.md`;
