@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Definir uma arquitetura de referência para chats profissionais com IA, executável em Python numa VPS, sem impor canal, framework de agentes ou provider de LLM.
+Definir uma arquitetura de referência para chats profissionais com IA, executável em Python numa VPS ou em um perfil AWS, sem impor canal, framework de agentes ou provider de LLM.
 
 ## Ordem de leitura
 
@@ -20,7 +20,9 @@ Definir uma arquitetura de referência para chats profissionais com IA, executá
 12. [Customização](customization.md)
 13. [Níveis de maturidade](maturity-levels.md)
 14. [Deploy em VPS](deployment-vps.md)
-15. [Referências](references.md)
+15. [Deploy na AWS](deployment-aws.md)
+16. [AWS Generative AI Lens para chats/assistentes](../aws-generative-ai-lens/index.md)
+17. [Referências](references.md)
 
 ## Decisões estruturais
 
@@ -30,6 +32,8 @@ Definir uma arquitetura de referência para chats profissionais com IA, executá
 - [ADR-0004 — MCP como fronteira de tools](../adr/ADR-0004-mcp-tool-boundary.md)
 - [ADR-0005 — Transactional outbox](../adr/ADR-0005-transactional-outbox.md)
 - [ADR-0006 — Envelope canônico de canal](../adr/ADR-0006-canonical-channel-envelope.md)
+
+O perfil AWS implementa essas decisões com serviços gerenciados; ele não altera a direção de dependências. Um perfil serverless que substitua PostgreSQL como fila ou mude a semântica de estado exige ADR específico.
 
 ## Fontes de verdade
 
@@ -42,6 +46,7 @@ Definir uma arquitetura de referência para chats profissionais com IA, executá
 | Segurança | `docs/security/threat-model.md` |
 | Operação | `docs/runbooks/` |
 | Perfil derivado | `config/<projeto>.yaml` |
+| Review AWS/GenAI | `docs/aws-generative-ai-lens/` |
 
 ## Regra de atualização
 
@@ -52,4 +57,6 @@ Atualize arquitetura, spec, contratos e testes no mesmo PR quando uma mudança:
 - mudar envelope de canal, evento, tool ou resultado;
 - introduzir dependência operacional;
 - alterar autorização, dados ou tenancy;
-- mudar a resposta esperada em incidente.
+- mudar a resposta esperada em incidente;
+- trocar perfil de deploy ou serviço de estado/fila;
+- mudar modelo, região, knowledge ou nível de agência de forma material.
