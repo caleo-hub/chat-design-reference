@@ -5,6 +5,7 @@
 /specs/ @caleo-hub
 /contracts/ @caleo-hub
 /docs/architecture/ @caleo-hub
+/docs/aws-generative-ai-lens/ @caleo-hub
 /docs/adr/ @caleo-hub
 /docs/security/ @caleo-hub
 /.github/workflows/ @caleo-hub
