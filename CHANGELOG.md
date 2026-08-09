@@ -6,6 +6,16 @@ O formato segue uma adaptação de Keep a Changelog e o projeto usa versionament
 
 ## [Unreleased]
 
+### Adicionado
+
+- adaptação completa do AWS Well-Architected Generative AI Lens para chats e assistentes;
+- princípios, Responsible AI, lifecycle, data architecture e padrões de Agentic AI;
+- arquiteturas-base AWS para ECS/Fargate, RAG, tools transacionais, multi-tenant, contact center, serverless e modelos customizados;
+- perfil de deploy AWS preservando o monólito modular, PostgreSQL inbox/leases/outbox e portas neutras;
+- oito cenários do Lens adaptados ao contexto do repositório;
+- seis pilares e checklist das 51 best practices com lifecycle, gates e evidências;
+- glossário, fontes, política de revisão, atribuição e notices.
+
 ### Planejado
 
 - primeira fatia vertical durável com PostgreSQL, inbox, leases, heartbeat e outbox;
